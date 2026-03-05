@@ -3547,7 +3547,12 @@
             const monthExpenses = getSelectedMonthExpenses();
             
             if (monthExpenses.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 4rem; color: var(--text-tertiary);">No hay gastos este mes</div>';
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 4rem; color: var(--text-tertiary);">
+                        <div style="font-size: 2.5rem; margin-bottom: 1rem;">📭</div>
+                        <h3 style="margin-bottom: 0.5rem; color: var(--text-secondary);">Aún no hay gastos este mes</h3>
+                        <p style="font-size: 0.9rem;">Registra tu primer gasto con el botón "Nuevo Gasto"</p>
+                    </div>`;
                 return;
             }
 
@@ -3725,6 +3730,26 @@
             const ctx = document.getElementById('categoryChart');
             if (!ctx) return;
 
+            if (monthExpenses.length === 0) {
+                if (categoryChartInstance) { categoryChartInstance.destroy(); categoryChartInstance = null; }
+                ctx.style.display = 'none';
+                const parent = ctx.parentElement;
+                if (!parent.querySelector('.chart-empty')) {
+                    const empty = document.createElement('div');
+                    empty.className = 'chart-empty';
+                    empty.style.cssText = 'text-align:center;padding:2rem;color:var(--text-tertiary);font-size:0.9rem;';
+                    empty.innerHTML = '📊 Aún no hay datos para mostrar';
+                    parent.appendChild(empty);
+                }
+                return;
+            }
+
+            // Limpiar empty state si existía
+            ctx.style.display = '';
+            const parent = ctx.parentElement;
+            const empty = parent.querySelector('.chart-empty');
+            if (empty) empty.remove();
+
             const categoryTotals = {};
             Object.keys(BUDGET).forEach(cat => categoryTotals[cat] = 0);
             monthExpenses.forEach(exp => {
@@ -3803,6 +3828,25 @@
             const ctx = document.getElementById('timelineChart');
             if (!ctx) return;
 
+            if (monthExpenses.length === 0) {
+                if (timelineChartInstance) { timelineChartInstance.destroy(); timelineChartInstance = null; }
+                ctx.style.display = 'none';
+                const parent = ctx.parentElement;
+                if (!parent.querySelector('.chart-empty')) {
+                    const empty = document.createElement('div');
+                    empty.className = 'chart-empty';
+                    empty.style.cssText = 'text-align:center;padding:2rem;color:var(--text-tertiary);font-size:0.9rem;';
+                    empty.innerHTML = '📈 Aún no hay datos para mostrar';
+                    parent.appendChild(empty);
+                }
+                return;
+            }
+
+            ctx.style.display = '';
+            const parent = ctx.parentElement;
+            const empty = parent.querySelector('.chart-empty');
+            if (empty) empty.remove();
+
             const daysInMonth = new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1, 0).getDate();
             const dailyTotals = Array(daysInMonth).fill(0);
             monthExpenses.forEach(exp => {
@@ -3873,6 +3917,16 @@
             if (!container) return;
 
             const totalBudget = getTotalBudget();
+            const monthExpenses = getSelectedMonthExpenses();
+
+            if (monthExpenses.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 1.5rem; color: var(--text-tertiary);">
+                        <p style="font-size: 0.9rem;">Aún no hay gastos este mes — las aportaciones aparecerán aquí</p>
+                    </div>`;
+                return;
+            }
+
             const andreaRatio = getIncomeRatio('andrea');
             const angelRatio = getIncomeRatio('angel');
 
@@ -3901,12 +3955,21 @@
             `;
         }
 
-        // TRACKING DE DEUDA
         function renderDebtTracker() {
             const container = document.getElementById('debtTracker');
             if (!container) return;
 
             const monthExpenses = getSelectedMonthExpenses();
+
+            if (monthExpenses.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                        <div style="font-size: 2rem; margin-bottom: 0.75rem;">💸</div>
+                        <p style="font-size: 0.9rem;">Aún no hay gastos para calcular el balance</p>
+                    </div>`;
+                return;
+            }
+
             const totalBudget = getTotalBudget();
 
             const andreaShould = totalBudget * getIncomeRatio('andrea');
@@ -4562,8 +4625,9 @@
 
             if (recurringExpenses.length === 0) {
                 container.innerHTML = `
-                    <div class="card" style="text-align: center; padding: 2rem; background: var(--bg-secondary);">
-                        <p style="color: var(--text-tertiary);">No hay gastos recurrentes configurados</p>
+                    <div style="text-align: center; padding: 2rem; color: var(--text-tertiary);">
+                        <div style="font-size: 2rem; margin-bottom: 0.75rem;">🔄</div>
+                        <p style="font-size: 0.9rem;">Aún no hay gastos recurrentes — agrega uno con el botón de arriba</p>
                     </div>
                 `;
                 return;
@@ -4689,7 +4753,12 @@
             if (!container) return;
             
             if (monthExpenses.length === 0) {
-                container.innerHTML = '<div style="text-align: center; padding: 3rem; color: var(--text-tertiary);">No hay gastos personales este mes</div>';
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 3rem; color: var(--text-tertiary);">
+                        <div style="font-size: 2.5rem; margin-bottom: 1rem;">💎</div>
+                        <h3 style="margin-bottom: 0.5rem; color: var(--text-secondary);">Aún no hay gastos personales</h3>
+                        <p style="font-size: 0.9rem;">Registra un gasto usando el formulario de arriba</p>
+                    </div>`;
                 return;
             }
             
